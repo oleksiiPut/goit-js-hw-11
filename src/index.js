@@ -27,8 +27,8 @@ async function fetchImages(e) {
     });
     const url = `${BASE_URL}?${searchParams}`;
     const searchResponse = await Axios.get(url);
-    console.log(searchResponse);
-    return searchResponse;
+    console.log(searchResponse.data.hits);
+    return searchResponse.data.hits;
   } catch (error) {
     console.log(error);
   }
