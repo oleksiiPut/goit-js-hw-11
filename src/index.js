@@ -11,7 +11,7 @@ const refs = {
   galleryContainer: document.querySelector('.gallery'),
 };
 
-refs.searchForm.addEventListener('submit', fetchImages);
+refs.searchForm.addEventListener('submit', searchImage);
 
 async function fetchImages(e) {
   e.preventDefault();
@@ -40,32 +40,35 @@ function onEmptyResponse() {
   );
 }
 
-// function searchImage(e) {
-//   e.preventDefault();
-//   const responseImage = e.target.value.trim();
-//   try {
-//     fetchImages(responseImage).then(response => {
-//       if (response.hits.length === 0) {
-//         onEmptyResponse();
-//       }
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// }
+function searchImage(e) {
+  e.preventDefault();
+  const responseImage = e.target.value.trim();
+  try {
+    fetchImages(responseImage).then(response => {
+      if (response.hits.length === 0) {
+        onEmptyResponse();
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+}
 
 function renderImageCard(elements) {
-  const markup = elements.map(
-    ({
-      webformatURL,
-      largeImageURL,
-      tags,
-      likes,
-      views,
-      comments,
-      downloads,
-    }) => `<div class="photo-card">
+  const markup = elements
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<div class="photo-card">
+  <a href="${largeImageURL}">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" />
+  </a>
   <div class="info">
     <p class="info-item">
       <b>${likes} Likes</b>
@@ -81,5 +84,11 @@ function renderImageCard(elements) {
     </p>
   </div>
 </div>`
-  );
+    )
+    .join('');
+  refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
 }
+
+const clearImageCard = () => {
+  refs.galleryContainer.innerHTML = '';
+};
