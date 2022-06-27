@@ -18,7 +18,8 @@ const lightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 let page = 1;
-let totalImages = 0;
+let totalImages = 50;
+let totalHits = 0;
 
 refs.searchForm.addEventListener('submit', searchImage);
 refs.btn.addEventListener('click', onLoadMore);
@@ -34,19 +35,19 @@ async function fetchImages(query) {
       orientation: 'horizontal',
       safesearch: true,
       page: page,
-      per_page: 40,
+      per_page: 50,
     });
     const url = `${BASE_URL}?${searchParams}`;
     const searchResponse = await Axios.get(url);
     console.log(searchResponse.data.totalHits);
-    return searchResponse.data.hits;
+    return searchResponse;
   } catch (error) {
     console.log(error);
   }
 }
 
 function renderImageCard(elements) {
-  const markup = elements
+  const markup = elements.data.hits
     .map(
       ({
         webformatURL,
@@ -63,16 +64,16 @@ function renderImageCard(elements) {
   </div>
   <div class="info">
     <p class="info-item">
-      <b>${likes} Likes</b>
+      ${likes} <b>Likes</b>
     </p>
     <p class="info-item">
-      <b>${views} Views</b>
+      ${views} <b>Views</b>
     </p>
     <p class="info-item">
-      <b>${comments} Comments</b>
+      ${comments} <b>Comments</b>
     </p>
     <p class="info-item">
-      <b>${downloads} Downloads</b>
+      ${downloads} <b>Downloads</b>
     </p>
   </div>
   </a>
@@ -122,9 +123,24 @@ async function onLoadMore() {
     const searchQuery = refs.input.value.trim();
     const responseImages = await fetchImages(searchQuery);
     await renderImageCard(responseImages);
+
+    totalImages += responseImages.data.hits.length;
+    console.log(totalImages);
+    totalHits = responseImages.data.totalHits;
+    console.log(totalHits);
+    if (totalImages >= totalHits) {
+      onTheEnd();
+    }
   } catch (error) {
     console.log(error.message);
   }
+}
+
+function onTheEnd() {
+  refs.btn.style.display = 'none';
+  Notiflix.Notify.info(
+    "We're sorry, but you've reached the end of search results."
+  );
 }
 
 // const onTheEnd = data => {
