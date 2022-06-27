@@ -18,7 +18,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
 });
 let page = 1;
-let totalImages = 50;
+let totalImages = 0;
 let totalHits = 0;
 
 refs.searchForm.addEventListener('submit', searchImage);
@@ -35,11 +35,11 @@ async function fetchImages(query) {
       orientation: 'horizontal',
       safesearch: true,
       page: page,
-      per_page: 50,
+      per_page: 40,
     });
     const url = `${BASE_URL}?${searchParams}`;
     const searchResponse = await Axios.get(url);
-    console.log(searchResponse.data.totalHits);
+    // console.log(searchResponse.data.totalHits);
     return searchResponse;
   } catch (error) {
     console.log(error);
@@ -101,7 +101,8 @@ async function searchImage(e) {
     const searchQuery = refs.input.value.trim();
     const responseImages = await fetchImages(searchQuery);
     await renderImageCard(responseImages);
-    page += 1;
+    page = 1;
+    totalImages = 40;
     refs.btn.style.display = 'block';
 
     if (searchQuery === '' || searchQuery === ' ' || searchQuery.length === 0) {
@@ -112,6 +113,7 @@ async function searchImage(e) {
       return;
     }
     console.log(responseImages);
+    console.log(page);
   } catch (error) {
     console.log(error.message);
   }
@@ -126,9 +128,10 @@ async function onLoadMore() {
 
     totalImages += responseImages.data.hits.length;
     console.log(totalImages);
+    console.log(page);
     totalHits = responseImages.data.totalHits;
-    console.log(totalHits);
-    if (totalImages >= totalHits) {
+    // console.log(totalHits);
+    if (totalImages > totalHits) {
       onTheEnd();
     }
   } catch (error) {
@@ -142,20 +145,3 @@ function onTheEnd() {
     "We're sorry, but you've reached the end of search results."
   );
 }
-
-// const onTheEnd = data => {
-//   totalImages += data.hits;
-//   if (data.totalHits <= totalImages) {
-//     refs.btn.style.display = 'none';
-//     Notiflix.Notify.info(
-//       "We're sorry, but you've reached the end of search results."
-//     );
-//   }
-// };
-
-// const totalPages = Math.ceil(responseImages.data.totalHits / 40);
-// if (page > totalPages) {
-//   Notiflix.Notify.info(
-//     "We're sorry, but you've reached the end of search results."
-//   );
-// }
