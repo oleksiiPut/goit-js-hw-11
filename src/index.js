@@ -34,8 +34,8 @@ async function fetchImages(query) {
       image_type: 'photo',
       orientation: 'horizontal',
       safesearch: true,
-      page: page,
       per_page: 40,
+      page: page,
     });
     const url = `${BASE_URL}?${searchParams}`;
     const searchResponse = await Axios.get(url);
@@ -96,14 +96,14 @@ function onEmptyResponse() {
 
 async function searchImage(e) {
   try {
+    page = 1;
+    refs.btn.style.display = 'none';
     e.preventDefault();
     clearImageCard();
     const searchQuery = refs.input.value.trim();
     const responseImages = await fetchImages(searchQuery);
     await renderImageCard(responseImages);
-    page = 1;
     totalImages = 40;
-    refs.btn.style.display = 'block';
 
     if (searchQuery === '' || searchQuery === ' ' || searchQuery.length === 0) {
       page = 1;
@@ -114,6 +114,7 @@ async function searchImage(e) {
     }
     console.log(responseImages);
     console.log(page);
+    refs.btn.style.display = 'block';
   } catch (error) {
     console.log(error.message);
   }
@@ -131,7 +132,7 @@ async function onLoadMore() {
     console.log(page);
     totalHits = responseImages.data.totalHits;
     // console.log(totalHits);
-    if (totalImages > totalHits) {
+    if (totalImages >= totalHits) {
       onTheEnd();
     }
   } catch (error) {
